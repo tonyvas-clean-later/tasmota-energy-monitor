@@ -34,8 +34,8 @@ class EnergyLogger{
         try{
             let date = new Date();
             let year = date.getFullYear();
-            let month = String(date.getMonth()).padStart(2, '0');
-            let day = String(date.getDay()).padStart(2, '0');
+            let month = String(date.getMonth() + 1).padStart(2, '0');
+            let day = String(date.getDate()).padStart(2, '0');
 
             let name = `${plug}_${year}-${month}-${day}`;
             let path = `${DUMP_LOG_PATH}/${name}.csv`
