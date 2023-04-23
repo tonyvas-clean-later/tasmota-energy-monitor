@@ -1,1 +1,22 @@
-{}
+{
+    "ups": {
+        "name": "UPS",
+        "address": "192.168.101.210",
+        "poll_interval": 1000
+    },
+    "netmox": {
+        "name": "Netmox",
+        "address": "192.168.101.211",
+        "poll_interval": 1000
+    },
+    "mainmox": {
+        "name": "Mainmox",
+        "address": "192.168.101.212",
+        "poll_interval": 1000
+    },
+    "truenas": {
+        "name": "TrueNAS",
+        "address": "192.168.101.213",
+        "poll_interval": 1000
+    }
+}
