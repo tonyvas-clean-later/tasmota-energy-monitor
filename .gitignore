@@ -1,4 +1,6 @@
 dump/*
+autostart.service
+start.sh
 
 # Logs
 logs
