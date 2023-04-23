@@ -1,0 +1,10 @@
+[Unit]
+Description=Energy Monitoring Server
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+ExecStart=/usr/bin/bash /path/to/start.sh
+
+[Install]
+WantedBy=multi-user.target
