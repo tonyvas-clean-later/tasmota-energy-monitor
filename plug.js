@@ -3,17 +3,9 @@ const http = require('http');
 const HTTP_URI = 'cm?cmnd=status%2010';
 const ENERGY_RESPONSE_KEYS = ['Voltage', 'Current', 'Factor', 'Power', 'ApparentPower', 'ReactivePower']
 
-class EnergyMonitor{
-    constructor(name, address, interval){
-        this.name = name;
+class Plug{
+    constructor(address){
         this.address = address;
-        this.interval = interval;
-    }
-
-    start(onData, onError){
-        this.handle = setInterval(() => {
-            this.fetch().then(onData).catch(onError);
-        }, this.interval);
     }
 
     fetch(){
@@ -50,4 +42,4 @@ class EnergyMonitor{
     }
 }
 
-module.exports = EnergyMonitor
+module.exports = Plug

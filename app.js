@@ -1,5 +1,5 @@
 const HTTPServer = require('./http-server')
-const EnergyLogger = require('./energy-logger');
+const PlugManager = require('./plug-manager');
 
 const DEFAULT_PORT = 8080
 const DEFAULT_PLUG_CONFIG = `${__dirname}/plugs.json`
@@ -17,7 +17,7 @@ function start(){
         
         let promises = [
             startHTTP(port),
-            startLogger(plugsConfig)
+            startPlugManager(plugsConfig)
         ]
 
         Promise.all(promises).then(resolve).catch(reject);
@@ -33,11 +33,11 @@ function startHTTP(port){
     })
 }
 
-function startLogger(plugsConfig){
+function startPlugManager(plugsConfig){
     return new Promise((resolve, reject) => {
-        let logger = new EnergyLogger(plugsConfig);
-        logger.start(() => {
-            resolve(logger)
+        let manager = new PlugManager(plugsConfig);
+        manager.start(() => {
+            resolve(manager)
         }).catch(reject)
     })
 }
