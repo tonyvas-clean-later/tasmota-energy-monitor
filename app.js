@@ -7,7 +7,7 @@ const DEFAULT_PLUG_CONFIG = `${__dirname}/plugs.json`
 start().then(() => {
     console.log('Service running!');
 }).catch(err => {
-    console.error('Error:', err);
+    console.error('Error: failed to start main service', err);
 })
 
 function start(){
@@ -29,7 +29,9 @@ function startHTTP(port){
         let http = new HTTPServer(port);
         http.start(() => {
             resolve(http);
-        }).catch(reject)
+        }).catch(err => {
+            reject(new Error('Failed to start HTTP server', err))
+        })
     })
 }
 
@@ -38,6 +40,8 @@ function startPlugManager(plugsConfig){
         let manager = new PlugManager(plugsConfig);
         manager.start(() => {
             resolve(manager)
-        }).catch(reject)
+        }).catch(err => {
+            reject(new Error('Failed to start PlugManager service', err))
+        })
     })
 }

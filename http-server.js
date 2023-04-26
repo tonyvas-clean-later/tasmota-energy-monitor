@@ -1,6 +1,8 @@
 const express = require('express')
 const http = require('http')
 
+const ERROR_PREFIX = 'HTTP server error'
+
 class HTTPServer {
     constructor(port) {
         this.port = port;
@@ -14,13 +16,23 @@ class HTTPServer {
 
                 // Log all requests
                 this.app.all("*", (req, res, next) => {
-                    console.log(`${new Date().toLocaleString()} | ${req.method} | ${req.socket.remoteAddress} | ${req.url}`);
-                    next();
+                    try{
+                        console.log(`${new Date().toLocaleString()} | ${req.method} | ${req.socket.remoteAddress} | ${req.url}`);
+                        next();
+                    }
+                    catch(err){
+                        console.error(`${ERROR_PREFIX}: failed to log request!`, err);
+                    }
                 });
 
                 // GET homepage
                 this.app.get('/', (req, res) => {
-                    res.end('oi!')
+                    try{
+                        res.end('oi!')
+                    }
+                    catch(err){
+                        console.error(`${ERROR_PREFIX}: failed to server default response!`, err);
+                    }
                 })
 
                 // Start server
@@ -28,7 +40,7 @@ class HTTPServer {
                     resolve();
                 })
             } catch (e) {
-                reject(e)
+                reject(new Error(`${ERROR_PREFIX}: failed to start HTTP server`, e))
             }
         })
     }

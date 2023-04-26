@@ -1,6 +1,8 @@
 const fs = require('fs');
 const Plug = require('./plug');
 
+const ERROR_PREFIX = 'PlugManager error'
+
 const DUMP_LOG_PATH = `${__dirname}/dump`
 const POLL_INTERVAL_MS = 1000;
 
@@ -23,14 +25,14 @@ class PlugManager{
                         this.plugs[name].fetch().then(data => {
                             this.writeData(name, data)
                         }).catch(err => {
-                            console.error(err);
+                            console.error(`${ERROR_PREFIX}: failed to fetch plug ${name}`, err);
                         })
                     }, POLL_INTERVAL_MS);
                 }
 
                 resolve();
             }).catch(err => {
-                console.error(err);
+                reject(new Error(`${ERROR_PREFIX}: failed to setup plugs`, err))
             })
         })
     }
@@ -46,7 +48,9 @@ class PlugManager{
                 }
 
                 resolve();
-            }).catch(reject);
+            }).catch(err => {
+                reject(new Error(`${ERROR_PREFIX}: failed to get plugs config`, err))
+            });
         })
     }
 
@@ -62,41 +66,46 @@ class PlugManager{
     }
 
     writeData(name, data){
-        try{
-            let date = new Date();
-            let path = this.getDumpFilepath(name, date);
-
-            let values = [];
-
-            values.push([TIME_KEY, date.getTime()].join(KEY_VALUE_SEPARATOR));
-            
-            for (let entry of Object.entries(data)){
-                values.push(entry.join(KEY_VALUE_SEPARATOR))
-            }
-
-            fs.appendFile(path, values.join(CSV_SEPARATOR) + '\n', err => {
-                if (err){
-                    console.error(err);
+        return new Promise((resolve, reject) => {
+            try{
+                let date = new Date();
+                let path = this.getDumpFilepath(name, date);
+    
+                let values = [];
+    
+                values.push([TIME_KEY, date.getTime()].join(KEY_VALUE_SEPARATOR));
+                
+                for (let entry of Object.entries(data)){
+                    values.push(entry.join(KEY_VALUE_SEPARATOR))
                 }
-            })
-        }
-        catch(err){
-            console.error(name, err);
-        }
+    
+                fs.appendFile(path, values.join(CSV_SEPARATOR) + '\n', err => {
+                    if (err){
+                        reject(new Error(`${ERROR_PREFIX}: failed to write data`, err))
+                    }
+                    else{
+                        resolve();
+                    }
+                })
+            }
+            catch(err){
+                reject(new Error(`${ERROR_PREFIX}: failed to parse plug data for writing`, err))
+            }
+        })
     }
 
     readConfig(){
         return new Promise((resolve, reject) => {
             fs.readFile(this.configPath, 'utf-8', (err, data) => {
                 if (err){
-                    reject(err)
+                    reject(new Error(`${ERROR_PREFIX}: failed to read config file`, err))
                 }
                 else{
                     try{
                         resolve(JSON.parse(data));
                     }
                     catch(err){
-                        reject(err)
+                        reject(new Error(`${ERROR_PREFIX}: failed to parse json config from file`, err))
                     }
                 }
             })
