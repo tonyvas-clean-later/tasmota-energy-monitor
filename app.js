@@ -4,6 +4,7 @@ const PlugManager = require('./plug-manager');
 const DEFAULT_PORT = 8080
 const DEFAULT_PLUG_CONFIG = `${__dirname}/plugs.json`
 
+// Start all services
 start().then(() => {
     console.log('Service running!');
 }).catch(err => {
@@ -12,23 +13,26 @@ start().then(() => {
 
 function start(){
     return new Promise((resolve, reject) => {
+        // Read values from env, or assume default
         let port = process.env.PORT || DEFAULT_PORT
         let plugsConfig = process.env.PLUG_CONFIG || DEFAULT_PLUG_CONFIG;
         
+        // Start services
         let promises = [
             startHTTP(port),
             startPlugManager(plugsConfig)
         ]
 
+        // Wait for services to start successfully, or fail
         Promise.all(promises).then(resolve).catch(reject);
     })
 }
 
 function startHTTP(port){
     return new Promise((resolve, reject) => {
-        let http = new HTTPServer(port);
-        http.start(() => {
-            resolve(http);
+        // Start HTTP server
+        new HTTPServer(port).start(() => {
+            resolve();
         }).catch(err => {
             reject(new Error('Failed to start HTTP server', err))
         })
@@ -37,9 +41,9 @@ function startHTTP(port){
 
 function startPlugManager(plugsConfig){
     return new Promise((resolve, reject) => {
-        let manager = new PlugManager(plugsConfig);
-        manager.start(() => {
-            resolve(manager)
+        // Start plug manager service
+        new PlugManager(plugsConfig).start(() => {
+            resolve()
         }).catch(err => {
             reject(new Error('Failed to start PlugManager service', err))
         })

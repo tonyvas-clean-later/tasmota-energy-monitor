@@ -11,6 +11,7 @@ class HTTPServer {
     start() {
         return new Promise((resolve, reject) => {
             try {
+                // Create HTTP server using express
                 this.app = express()
                 this.server = http.createServer(this.app)
 
