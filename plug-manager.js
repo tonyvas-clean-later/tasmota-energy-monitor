@@ -4,7 +4,7 @@ const Plug = require('./plug');
 const ERROR_PREFIX = 'PlugManager error'
 
 const DUMP_LOG_PATH = `${__dirname}/dump`
-const POLL_INTERVAL_MS = 1000;
+const POLL_INTERVAL_MS = 5000;
 
 const TIME_KEY = 'Time'
 const KEY_VALUE_SEPARATOR = ':'
