@@ -1,6 +1,4 @@
-dump/*
-autostart.service
-start.sh
+db/database.db
 
 # Logs
 logs
