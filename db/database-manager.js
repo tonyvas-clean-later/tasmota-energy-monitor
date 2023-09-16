@@ -258,9 +258,16 @@ class DatabaseManager{
     // Gets a list of all polls for a plug
     selectPollsByPlugName(name){
         return new Promise((resolve, reject) => {
+            const SQL = `
+                SELECT * FROM plug 
+                INNER JOIN poll 
+                ON plug.plug_id = poll.plug_id 
+                WHERE plug.name = "${name}";
+            `
+
             this._setupIfNeeded().then(() => {
                 // Run select query
-                this._queryAll(`SELECT * FROM plug, poll WHERE plug.plug_id = poll.plug_id AND name = "${name}"`).then(res => {
+                this._queryAll(SQL).then(res => {
                     resolve(res);
                 }).catch(err => {
                     reject(new Error(`${ERROR_PREFIX}.selectPollsByPlugName: failed to run query \n\t${err.message}`));
