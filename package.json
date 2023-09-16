@@ -18,7 +18,9 @@
   },
   "homepage": "https://github.com/tonyvas-pro/tasmota-energy-monitor#readme",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.12",
     "express": "^4.18.2",
+    "puppeteer": "^21.2.1",
     "sqlite3": "^5.1.6"
   }
 }
