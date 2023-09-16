@@ -16,15 +16,19 @@ class Scraper{
 
     async start(){
         try {
+            // Start a browser and open new page
             let browser = await puppeteer.launch({args: ['--no-sandbox', '--disable-setuid-sandbox']});
             let page = await browser.newPage();
 
+            // Navigate to tasmoadmin page
             await page.goto(URL);
             await page.setViewport(VIEWPORT);
 
+            // Start a timer to scrape and parse content from page
             setInterval(() => {
+                // Scrape page
                 this.run(page).catch(console.error)
-            }, 1000);
+            }, SCRAPE_INTERVAL_MS);
         } catch (error) {
             throw new Error(`${ERROR_PREFIX}.start: failed to navigate website \n\t${error.message}`)
         }
@@ -32,10 +36,14 @@ class Scraper{
 
     async run(page){
         try {
+            // Get current timestamp
             let timestampMS = new Date().getTime();
+
+            // Get html from page and scrape it for plug data
             let html = await page.content();
             let plugs = this.scrape(html);
             
+            // Try pushing each plug to the database
             for (let plug of plugs){
                 try {
                     await this.db.addPoll(plug['name'], timestampMS, plug['runtime'], plug['energy']);
@@ -53,7 +61,9 @@ class Scraper{
             let plugs = [];
             let $ = cheerio.load(html);
 
+            // Iterate over the table rows for each plug
             for (let row of $('#device-list').find('tbody').find('tr')){
+                // Get plug data
                 plugs.push(this.getPlugDataFromRow($, row));
             }
 
@@ -67,9 +77,12 @@ class Scraper{
         try {
             let plug = {};
 
+            // Iterate over every cell in table row
             for (let cell of $(row).find('td')){
+                // Get key representing value of cell
                 let key = $(cell).find('b').text().trim();
 
+                // Check if key is relevant, handle if it is
                 switch (key) {
                     case 'Name':
                         plug['name'] = this.parseName($, cell);
@@ -104,9 +117,11 @@ class Scraper{
             'd': 24 * 60 * 60
         }
 
+        // Get the string version of runtime
         let runtimeStr = $(cell).find('span').text().trim();
         let runtimeS = 0;
 
+        // Convert string to seconds
         for (let part of runtimeStr.split(' ')){
             let value = part.substring(0, part.length - 1);
             let key = part.substring(part.length - 1)
@@ -118,6 +133,7 @@ class Scraper{
     }
 
     parseEnergy($, cell){
+        // First value of energy cell
         return Number($(cell).find('span').text().trim().split(' ')[0])
     }
 }
